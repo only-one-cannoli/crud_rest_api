@@ -6,3 +6,6 @@ include_trailing_comma = true
 
 [tool.black]
 line_length = 79
+
+[tool.mypy]
+warn_unreachable = true
