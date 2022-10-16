@@ -4,13 +4,13 @@ from os.path import exists
 
 import pytest
 
-from ..db.db import (
+from src.db.db import (
     Queries,
     do_sql,
 )
-from ..defs.constants import Constants
-from ..defs.settings import Settings
-from ..defs.widget import Widget
+from src.defs.constants import Constants
+from src.defs.settings import Settings
+from src.defs.widget import Widget
 
 
 class TestDatabase:
