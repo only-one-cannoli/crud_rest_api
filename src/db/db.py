@@ -19,14 +19,14 @@ class Queries:
     """
 
 
-def do_sql(query: str, create_if_missing: bool=True) -> None:
+def do_sql(query: str) -> None:
     """
-    Executes an SQL query.  if the database file doesn't exist, it will be
+    Executes an SQL query.  If the database file doesn't exist, it will be
     created, together with the widgets table.
     """
 
-    if create_if_missing and not exists(Settings.db_path):
-        do_sql(Queries.create_table, False)
+    if query != Queries.create_table and not exists(Settings.db_path):
+        do_sql(Queries.create_table)
 
     with connect(Settings.db_path) as connection:
         cursor = connection.cursor()
@@ -34,4 +34,4 @@ def do_sql(query: str, create_if_missing: bool=True) -> None:
 
 
 if __name__ == "__main__":
-    do_sql(Queries.create_table, False)
+    do_sql(Queries.create_table)
