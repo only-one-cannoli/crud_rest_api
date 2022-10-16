@@ -21,7 +21,6 @@ class Queries:
             updated date
         );
     """
-    
 
 
 def do_sql(query: str, host_variables: Optional[Tuple[DbValue, ...]] = None) -> None:
