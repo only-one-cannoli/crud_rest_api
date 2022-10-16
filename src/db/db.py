@@ -1,9 +1,13 @@
 from dataclasses import dataclass
+from datetime import datetime
 from sqlite3 import connect
 from os.path import exists
+from typing import (Tuple, Optional, Union)
 
 from ..defs.settings import Settings
 
+
+DbValue = Union[int, str, datetime]
 
 @dataclass(frozen=True)
 class Queries:
@@ -17,9 +21,10 @@ class Queries:
             updated date
         );
     """
+    
 
 
-def do_sql(query: str) -> None:
+def do_sql(query: str, host_variables: Optional[Tuple[DbValue, ...]] = None) -> None:
     """
     Executes an SQL query.  If the database file doesn't exist, it will be
     created, together with the widgets table.
@@ -30,7 +35,10 @@ def do_sql(query: str) -> None:
 
     with connect(Settings.db_path) as connection:
         cursor = connection.cursor()
-        cursor.execute(query)
+        if host_variables is None:
+            cursor.execute(query)
+        else:
+            cursor.execute(query, host_variables)
 
 
 if __name__ == "__main__":
