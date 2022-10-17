@@ -14,9 +14,9 @@ class Constants:
     end_day: datetime = datetime(
         1997, 9, 1, microsecond=0, tzinfo=timezone.utc
     )
-    null_uuid: UUID = UUID("00000000-0000-0000-0000-000000000000")
-    range_uuid: UUID = UUID("12345678-9101-1121-3141-516171819202")
+    zeroes_uuid: UUID = UUID("00000000-0000-0000-0000-000000000000")
+    ones_uuid: UUID = UUID("11111111-1111-1111-1111-111111111111")
 
 
 if __name__ == "__main__":
-    print(Constants.unix_epoch, Constants.null_uuid)
+    print(Constants.unix_epoch, Constants.zeroes_uuid)

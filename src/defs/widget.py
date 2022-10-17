@@ -32,7 +32,7 @@ class Widget:
     @staticmethod
     def dummy():
         return Widget(
-            uuid=Constants.null_uuid,
+            uuid=Constants.zeroes_uuid,
             name="dummy",
             parts=9999,
             created=Constants.unix_epoch,

@@ -3,7 +3,10 @@ from dataclasses import (
     replace,
 )
 from os.path import exists
-from sqlite3 import connect
+from sqlite3 import (
+    ProgrammingError,
+    connect,
+)
 from typing import (
     List,
     Optional,
@@ -52,7 +55,9 @@ def do_sql(
 ) -> List[Tuple[DbValue, ...]]:
     """
     Executes an SQL query.  If the database file doesn't exist, it will be
-    created, together with a table.
+    created, together with a table.  Recursive -- calls itself if 1) the
+    database file doesn't exist, or 2) `query` corresponds to an insert,
+    update, or delete operation.
     """
 
     if query != Queries.create_table and not exists(database):
@@ -62,7 +67,12 @@ def do_sql(
         cursor = connection.cursor()
 
         if host_variables is None:
-            result = cursor.execute(query)
+            try:
+                result = cursor.execute(query)
+            except ProgrammingError as e:
+                raise ValueError(
+                    "host_variables cannot be None for this query!"
+                ) from e
         else:
             result = (
                 cursor.execute(query, shifted(host_variables))
@@ -73,62 +83,16 @@ def do_sql(
         first_word = query.split()[0]
         if first_word not in ("create", "select"):
             connection.commit()
-            # casting is OK because an insert should always have host_variables
             return do_sql(
                 Queries.select_by_uuid,
                 (cast(Tuple[DbValue, ...], host_variables)[0],),
                 database=database,
             )
 
-        return result.fetchall()
+        return result.fetchmany(Settings.to_fetch)
 
 
 def shifted(host_variables: Tuple[DbValue, ...]):
 
     lst = list(host_variables)
     return tuple(lst[1:] + [lst[0]])
-
-
-if __name__ == "__main__":
-    widget = Widget.dummy().to_tuple()
-    print(
-        do_sql(
-            Queries.insert_record,
-            widget,
-            database=Settings.test_database_path,
-        ),
-        "\n",
-    )
-    print(
-        do_sql(
-            Queries.select_all,
-            database=Settings.test_database_path,
-        ),
-        "\n",
-    )
-    print(
-        do_sql(
-            Queries.select_by_uuid,
-            (widget[0],),
-            database=Settings.test_database_path,
-        ),
-        "\n",
-    )
-    update_widget = replace(
-        Widget.from_tuple(widget), name="fake", updated=Constants.end_day
-    ).to_tuple()
-    print(
-        do_sql(
-            Queries.update_by_uuid,
-            update_widget,
-            database=Settings.test_database_path,
-        ),
-        "\n",
-    )
-    print(
-        do_sql(
-            Queries.delete_by_uuid,
-            (widget[0],),
-            database=Settings.test_database_path,
-        )
-    )

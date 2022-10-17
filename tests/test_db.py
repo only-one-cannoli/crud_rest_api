@@ -1,6 +1,7 @@
 from dataclasses import replace
 from os import remove
 from os.path import exists
+from sqlite3 import IntegrityError
 
 import pytest
 
@@ -24,7 +25,7 @@ class TestDatabase:
         dummy = Widget.dummy()
         return {
             "original": dummy.to_tuple(),
-            "another": replace(dummy, uuid=Constants.range_uuid).to_tuple(),
+            "another": replace(dummy, uuid=Constants.ones_uuid).to_tuple(),
             "updated": replace(
                 dummy, parts=7777, updated=Constants.end_day
             ).to_tuple(),
@@ -85,3 +86,26 @@ class TestDatabase:
             database=Settings.test_database_path,
         )
         assert result == [widgets["updated"]]
+
+    def test_insert_duplicate_uuid(self, widgets):
+        with pytest.raises(IntegrityError):
+            do_sql(
+                Queries.insert_record,
+                widgets["original"],
+                database=Settings.test_database_path,
+            )
+
+    def test_insert_bad_data(self):
+        """
+        Unfortunately, sqlite doesn't seem to do any type checking at all;
+        "brown" isn't coercible to an integer in Python, but sqlite accepts
+        it happily in the `parts` field.  The `strict` keyword doesn't seem
+        to be available in this version of sqlite, either.
+        """
+        bad_widget = ("the", "quick", "brown", "fox", "jumped")
+        result = do_sql(
+            Queries.insert_record,
+            bad_widget,
+            database=Settings.test_database_path,
+        )
+        assert result == [bad_widget]
