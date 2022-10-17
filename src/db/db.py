@@ -16,8 +16,8 @@ from typing import (
 )
 
 from ..defs.constants import Constants
+from ..defs.settings import Settings
 from ..defs.widget import Widget
-from ..main import Settings
 
 DbValue = Union[str, int]
 
@@ -35,21 +35,17 @@ class Queries:
             updated text not null
         );
     """
-    insert: str = f"""
+    insert_record: str = f"""
         insert into widgets values (?, ?, ?, ?, ?)
     """
     select_all: str = f"select * from widgets"
-    select_by_uuid: str = f"""
-        select * from widgets where uuid = ?
-    """
+    select_by_uuid: str = f"select * from widgets where uuid = ?"
     update_by_uuid: str = f"""
         update widgets
         set name = ?, parts = ?, created = ?, updated = ?
         where uuid = ?;
     """
-    delete_by_uuid: str = f"""
-        delete from widgets where uuid = ?
-    """
+    delete_by_uuid: str = f"delete from widgets where uuid = ?"
 
 
 def do_sql(

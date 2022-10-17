@@ -1,14 +1,11 @@
-[tool.bandit]
-exclude_dirs = ["tests",]
-
-[tool.black]
-line_length = 79
-
 [tool.isort]
 force_grid_wrap = 2
 multi_line_output = 3
 line_length = 79
 include_trailing_comma = true
+
+[tool.black]
+line_length = 79
 
 [tool.mypy]
 warn_unreachable = true
