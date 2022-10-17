@@ -9,3 +9,6 @@ line_length = 79
 
 [tool.mypy]
 warn_unreachable = true
+
+[tool.bandit]
+exclude_dirs = ["tests",]

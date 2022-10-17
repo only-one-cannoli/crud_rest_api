@@ -5,15 +5,16 @@ name = "pypi"
 
 [packages]
 tornado = "*"
+bandit = {extras = ["toml"], version = "*"}
 
 [dev-packages]
-bandit = "*"
 black = "*"
 isort = "*"
 mypy = "*"
 pylint = "*"
 requests = "*"
 pytest = "*"
+bandit = {extras = ["toml"], version = "*"}
 
 [requires]
 python_version = "3.9"

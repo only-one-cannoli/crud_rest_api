@@ -56,3 +56,12 @@ class Widget:
             created=datetime.fromisoformat(source[3]),
             updated=datetime.fromisoformat(source[4]),
         )
+
+    def to_dict(self):
+        return {
+            "uuid": str(self.uuid),
+            "name": self.name,
+            "parts": self.parts,
+            "created": self.created.isoformat(),
+            "updated": self.created.isoformat(),
+        }

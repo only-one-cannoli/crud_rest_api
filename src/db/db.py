@@ -17,15 +17,17 @@ from typing import (
 
 from ..defs.constants import Constants
 from ..defs.settings import Settings
-
-DbValue = Union[str, int]
+from .db_types import (
+    DbValue,
+    DbValues,
+)
 
 
 @dataclass(frozen=True)
 class Queries:
 
     # NOTE: Trailing comma in SQL gives sqlite3.OperationalError
-    create_table: str = f"""
+    create_table: str = """
         create table widgets (
             uuid text primary key not null,
             name text not null,
@@ -34,24 +36,24 @@ class Queries:
             updated text not null
         );
     """
-    insert_record: str = f"""
+    insert_record: str = """
         insert into widgets values (?, ?, ?, ?, ?)
     """
-    select_all: str = f"select * from widgets"
-    select_by_uuid: str = f"select * from widgets where uuid = ?"
-    update_by_uuid: str = f"""
+    select_all: str = "select * from widgets"
+    select_by_uuid: str = "select * from widgets where uuid = ?"
+    update_by_uuid: str = """
         update widgets
         set name = ?, parts = ?, created = ?, updated = ?
         where uuid = ?;
     """
-    delete_by_uuid: str = f"delete from widgets where uuid = ?"
+    delete_by_uuid: str = "delete from widgets where uuid = ?"
 
 
 def do_sql(
     query: str,
     host_variables: Optional[Tuple[DbValue, ...]] = None,
     database: str = Settings.database_path,
-) -> List[Tuple[DbValue, ...]]:
+) -> List[DbValues]:
     """
     Executes an SQL query.  If the database file doesn't exist, it will be
     created, together with a table.  Recursive -- calls itself if 1) the
