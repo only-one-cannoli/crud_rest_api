@@ -27,7 +27,7 @@ class Queries:
 
     # NOTE: Trailing comma in SQL gives sqlite3.OperationalError
     create_table: str = f"""
-        create table {Settings.table_name} (
+        create table widgets (
             uuid text primary key not null,
             name text not null,
             parts int,
@@ -36,16 +36,16 @@ class Queries:
         );
     """
     insert_record: str = f"""
-        insert into {Settings.table_name} values (?, ?, ?, ?, ?)
+        insert into widgets values (?, ?, ?, ?, ?)
     """
-    select_all: str = f"select * from {Settings.table_name}"
-    select_by_uuid: str = f"select * from {Settings.table_name} where uuid = ?"
+    select_all: str = f"select * from widgets"
+    select_by_uuid: str = f"select * from widgets where uuid = ?"
     update_by_uuid: str = f"""
-        update {Settings.table_name}
+        update widgets
         set name = ?, parts = ?, created = ?, updated = ?
         where uuid = ?;
     """
-    delete_by_uuid: str = f"delete from {Settings.table_name} where uuid = ?"
+    delete_by_uuid: str = f"delete from widgets where uuid = ?"
 
 
 def do_sql(
@@ -89,7 +89,7 @@ def do_sql(
                 database=database,
             )
 
-        return result.fetchmany(Settings.to_fetch)
+        return result.fetchall()
 
 
 def shifted(host_variables: Tuple[DbValue, ...]):

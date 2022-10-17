@@ -19,5 +19,3 @@ class Settings:
     localhost_port: int = 8888
     database_path: str = "src/db/widgets.db"
     test_database_path: str = "src/db/test_widgets.db"
-    table_name: str = "widgets"
-    to_fetch: int = 3
