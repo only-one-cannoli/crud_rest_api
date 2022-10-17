@@ -12,7 +12,6 @@ from tornado.web import RequestHandler
 from .constants import Constants
 
 
-# pylint: disable=abstract-method
 @dataclass
 class Widget:
 
@@ -57,14 +56,3 @@ class Widget:
             created=datetime.fromisoformat(source[3]),
             updated=datetime.fromisoformat(source[4]),
         )
-
-
-class WidgetHandler(RequestHandler):
-    def get(self, _):  # , uuid: Optional[UUID]=None):
-        self.write({"widgets": [], "_": _})
-
-    def post(self):  # , widget_data):
-        pass
-
-    def delete(self):  # , uuid):
-        pass

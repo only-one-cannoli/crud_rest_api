@@ -17,7 +17,6 @@ from typing import (
 
 from ..defs.constants import Constants
 from ..defs.settings import Settings
-from ..defs.widget import Widget
 
 DbValue = Union[str, int]
 
