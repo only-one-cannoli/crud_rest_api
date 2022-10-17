@@ -2,10 +2,6 @@ from dataclasses import (
     dataclass,
     replace,
 )
-from datetime import (
-    datetime,
-    timezone,
-)
 from os.path import exists
 from sqlite3 import connect
 from typing import (
@@ -18,8 +14,9 @@ from typing import (
 
 from ..defs.constants import Constants
 from ..defs.settings import Settings
-from ..defs.types import DbValue
 from ..defs.widget import Widget
+
+DbValue = Union[str, int]
 
 
 @dataclass(frozen=True)
@@ -74,7 +71,7 @@ def do_sql(
             )
 
         first_word = query.split()[0]
-        if first_word != "create" and first_word != "select":
+        if first_word not in ("create", "select"):
             connection.commit()
             # casting is OK because an insert should always have host_variables
             return do_sql(

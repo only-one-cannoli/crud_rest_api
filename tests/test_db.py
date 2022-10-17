@@ -20,52 +20,68 @@ class TestDatabase:
             remove(Settings.test_database_path)
 
     @pytest.fixture
-    def widget_tuple(self):
-        return Widget.dummy().to_tuple()
+    def widgets(self):
+        dummy = Widget.dummy()
+        return {
+            "original": dummy.to_tuple(),
+            "another": replace(dummy, uuid=Constants.range_uuid).to_tuple(),
+            "updated": replace(
+                dummy, parts=7777, updated=Constants.end_day
+            ).to_tuple(),
+        }
 
     @pytest.fixture
-    def updated_widget_tuple(self, widget_tuple):
-        return replace(
-            Widget.from_tuple(widget_tuple),
-            name="fake",
-            updated=Constants.end_day,
-        ).to_tuple()
+    def to_insert(self):
+        return ("original", "another")
 
-    def test_insert(self, remove_test_database, widget_tuple):
-        result = do_sql(
-            Queries.insert_record,
-            widget_tuple,
-            database=Settings.test_database_path,
-        )
-        assert result == [widget_tuple]
+    def test_insert(self, remove_test_database, widgets, to_insert):
+        # pylint: disable-next=pointless-statement
+        remove_test_database
+        for key in to_insert:
+            result = do_sql(
+                Queries.insert_record,
+                widgets[key],
+                database=Settings.test_database_path,
+            )
+            assert result == [widgets[key]]
 
-    def test_select_all(self, widget_tuple):
+    def test_select_all(self, widgets, to_insert):
         result = do_sql(
             Queries.select_all,
             database=Settings.test_database_path,
         )
-        assert result == [widget_tuple]
+        assert result == [widgets[k] for k in to_insert]
 
-    def test_select_by_uuid(self, widget_tuple):
-        result = do_sql(
-            Queries.select_by_uuid,
-            (widget_tuple[0],),
-            database=Settings.test_database_path,
-        )
-        assert result == [widget_tuple]
+    def test_select_by_uuid(self, widgets, to_insert):
+        for key in to_insert:
+            uuid = widgets[key][0]
+            result = do_sql(
+                Queries.select_by_uuid,
+                (uuid,),
+                database=Settings.test_database_path,
+            )
+            assert result == [widgets[key]]
 
-    def test_update_by_uuid(self, updated_widget_tuple):
+    def test_update_by_uuid(self, widgets):
         result = do_sql(
             Queries.update_by_uuid,
-            updated_widget_tuple,
+            widgets["updated"],
             database=Settings.test_database_path,
         )
-        assert result == [updated_widget_tuple]
+        assert result == [widgets["updated"]]
 
-    def test_delete_by_uuid(self, widget_tuple):
+    def test_delete_by_uuid(self, widgets):
+        uuid = widgets["another"][0]
         result = do_sql(
             Queries.delete_by_uuid,
-            (widget_tuple[0],),
+            (uuid,),
             database=Settings.test_database_path,
         )
         assert result == []
+
+    def test_post_delete(self, widgets):
+        result = do_sql(
+            Queries.select_all,
+            database=Settings.test_database_path,
+        )
+        assert result == [widgets["updated"]]

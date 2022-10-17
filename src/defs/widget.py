@@ -12,6 +12,7 @@ from tornado.web import RequestHandler
 from .constants import Constants
 
 
+# pylint: disable=abstract-method
 @dataclass
 class Widget:
 
