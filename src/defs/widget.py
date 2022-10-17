@@ -39,7 +39,7 @@ class Widget:
             updated=Constants.unix_epoch,
         )
 
-    def to_tuple(self):
+    def to_tuple(self) -> Tuple[str, str, int, str, str]:
         return (
             str(self.uuid),
             self.name,
@@ -57,14 +57,3 @@ class Widget:
             created=datetime.fromisoformat(source[3]),
             updated=datetime.fromisoformat(source[4]),
         )
-
-
-class WidgetHandler(RequestHandler):
-    def get(self, _):  # , uuid: Optional[UUID]=None):
-        self.write({"widgets": [], "_": _})
-
-    def post(self):  # , widget_data):
-        pass
-
-    def delete(self):  # , uuid):
-        pass
