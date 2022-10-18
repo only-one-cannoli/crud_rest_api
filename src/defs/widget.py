@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import (
+    Dict,
     Optional,
     Tuple,
     Type,
+    cast,
 )
 from uuid import UUID
 
@@ -37,11 +39,11 @@ class Widget:
             updated=Constants.unix_epoch,
         )
 
-    def to_tuple(self):
+    def to_tuple(self) -> DbValues:
         return (
             str(self.uuid),
             self.name,
-            self.parts,
+            str(self.parts),
             self.created.isoformat(),
             self.updated.isoformat(),
         )
@@ -51,16 +53,26 @@ class Widget:
         return Widget(
             uuid=UUID(source[0]),
             name=source[1],
-            parts=source[2],
+            parts=int(source[2]),
             created=datetime.fromisoformat(source[3]),
             updated=datetime.fromisoformat(source[4]),
         )
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         return {
             "uuid": str(self.uuid),
             "name": self.name,
-            "parts": self.parts,
+            "parts": str(self.parts),
             "created": self.created.isoformat(),
             "updated": self.created.isoformat(),
         }
+
+    @staticmethod
+    def from_dict(source: Dict[str, str]):
+        return Widget(
+            uuid=UUID(cast(Optional[str], source.get("uuid"))),
+            name=source["name"],
+            parts=int(source["parts"]),
+            created=datetime.fromisoformat(source["created"]),
+            updated=datetime.fromisoformat(source["updated"]),
+        )

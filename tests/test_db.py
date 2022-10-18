@@ -102,18 +102,3 @@ class TestDatabase:
                 widgets["original"],
                 database=Settings.test_database_path,
             )
-
-    def test_insert_bad_data(self):
-        """
-        Unfortunately, sqlite doesn't seem to do any type checking at all;
-        "brown" isn't coercible to an integer in Python, but sqlite accepts
-        it happily in the `parts` field.  The `strict` keyword doesn't seem
-        to be available in this version of sqlite, either.
-        """
-        bad_widget = ("the", "quick", "brown", "fox", "jumped")
-        result = do_sql(
-            Queries.insert_record,
-            bad_widget,
-            database=Settings.test_database_path,
-        )
-        assert result == [bad_widget]

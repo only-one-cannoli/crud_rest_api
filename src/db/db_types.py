@@ -3,5 +3,4 @@ from typing import (
     Union,
 )
 
-DbValue = Union[str, int]
-DbValues = Tuple[str, str, int, str, str]
+DbValues = Tuple[str, str, str, str, str]

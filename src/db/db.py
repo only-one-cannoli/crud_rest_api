@@ -17,10 +17,7 @@ from typing import (
 
 from ..defs.constants import Constants
 from ..defs.settings import Settings
-from .db_types import (
-    DbValue,
-    DbValues,
-)
+from .db_types import DbValues
 
 
 @dataclass(frozen=True)
@@ -31,7 +28,7 @@ class Queries:
         create table widgets (
             uuid text primary key not null,
             name text not null,
-            parts int,
+            parts text not null,
             created text not null,
             updated text not null
         );
@@ -52,7 +49,7 @@ class Queries:
 
 def do_sql(
     query: str,
-    host_variables: Optional[Tuple[DbValue, ...]] = None,
+    host_variables: Optional[Tuple[str, ...]] = None,
     database: str = Settings.database_path,
 ) -> List[DbValues]:
     """
@@ -87,14 +84,14 @@ def do_sql(
             connection.commit()
             return do_sql(
                 Queries.select_by_uuid,
-                (cast(Tuple[DbValue, ...], host_variables)[0],),
+                (cast(Tuple[str, ...], host_variables)[0],),
                 database=database,
             )
 
         return result.fetchall()
 
 
-def shifted(host_variables: Tuple[DbValue, ...]):
+def shifted(host_variables: Tuple[str, ...]):
 
     lst = list(host_variables)
     return tuple(lst[1:] + [lst[0]])
