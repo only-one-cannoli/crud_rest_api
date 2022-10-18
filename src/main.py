@@ -1,22 +1,31 @@
+"""
+main.py
+Patrick Applegate
+18 Oct 2022
+
+Contains code to run a Tornado app that provides get, post, patch, and delete
+API routes.  Run with pipenv run python -m src.main from the repo's top-level
+directory after installing all packages with pipenv install.
+"""
+
+from dataclasses import replace
 from datetime import (
     datetime,
     timezone,
 )
-from json import loads
 from typing import (
     Dict,
     List,
     Mapping,
-    Optional,
     Type,
     cast,
 )
-from urllib.parse import parse_qsl
 from uuid import uuid4
 
 from tornado.ioloop import IOLoop
 from tornado.web import (
     Application,
+    HTTPError,
     RequestHandler,
 )
 
@@ -29,7 +38,12 @@ from .defs.settings import Settings
 from .defs.widget import Widget
 
 
+# pylint: disable=abstract-method
 class WidgetHandler(RequestHandler):
+    """
+    Provides a web-based database interface for widgets.
+    """
+
     def get(self):
         """
         Gets records from the database.  The specific behavior of this function
@@ -42,14 +56,15 @@ class WidgetHandler(RequestHandler):
         * 0-1 relevant records if a uuid is supplied (uuid is unique)
         * 0-several relevant records if a name is supplied (name is not unique)
         """
-        # TODO: add pagination
         uuid = self.get_query_argument("uuid", None)
         name = self.get_query_argument("name", None)
 
         if uuid is not None and name is not None:
-            raise ValueError("Both uuid and name should not be supplied!")
+            raise HTTPError(
+                reason="Both uuid and name should not be supplied!"
+            )
 
-        elif uuid is None and name is None:
+        if uuid is None and name is None:
             db_widgets = do_sql(
                 Queries.select_all,
                 None,
@@ -109,15 +124,19 @@ class WidgetHandler(RequestHandler):
 
         Returns the updated record.
         """
-        db_widgets = do_sql(
-            Queries.select_by_uuid,
-            (self.get_query_argument("uuid"),),
-            Settings.database_path,
-        )  # TODO: another error if db_widgets is empty
+        db_widgets = check_existence(self.get_query_argument("uuid"))
 
-        old = Widget.from_tuple(db_widgets[0])
+        try:
+            old = Widget.from_tuple(db_widgets[0])
+        except ValueError as error:
+            raise HTTPError(
+                reason=f"Malformed record! {db_widgets[0]}"
+            ) from error
 
-        params = {k: bytes.decode(v[0]) for k, v in arguments.items()}
+        params = {
+            k: bytes.decode(v[0])
+            for k, v in self.request.query_arguments.items()
+        }
         to_update = {k: v for k, v in params.items() if k in ("name", "parts")}
 
         new = replace(old, **to_update, updated=datetime.now(timezone.utc))
@@ -132,19 +151,37 @@ class WidgetHandler(RequestHandler):
 
     def delete(self):
         """
-        Deletes a record from the database with a UUID supplied in params.
-        Other fields supplied through params will be ignored.
+        Deletes a record from the database with a UUID supplied in the query
+        parameters (the params argument in requests.delete()). Other fields
+        supplied through params will be ignored.
 
         Returns an empty array of records if successful, indicating that the
         deleted record no longer exists in the database.
         """
+        uuid = self.get_query_argument("uuid")
+        check_existence(uuid)
         db_widgets = do_sql(
             Queries.delete_by_uuid,
-            (self.get_query_argument("uuid"),),
+            (uuid,),
             Settings.database_path,
         )
 
         self.write({"widgets": to_array(db_widgets)})
+
+
+def check_existence(uuid: str) -> List[DbValues]:
+    """
+    Raises HTTPError if the uuid supplied is not found.
+    """
+    db_widgets = do_sql(
+        Queries.select_by_uuid,
+        (uuid,),
+        Settings.database_path,
+    )
+    if len(db_widgets) < 1:
+        raise HTTPError(reason="No match for uuid in database!")
+
+    return db_widgets
 
 
 def to_array(widget_tuples: List[DbValues]) -> List[Dict[str, str]]:
@@ -153,11 +190,11 @@ def to_array(widget_tuples: List[DbValues]) -> List[Dict[str, str]]:
     a list of dictionaries.
     """
     array = []
-    for wt in widget_tuples:
+    for w_t in widget_tuples:
         try:
-            array.append(Widget.from_tuple(wt).to_dict())
-        except ValueError:
-            continue
+            array.append(Widget.from_tuple(w_t).to_dict())
+        except ValueError as error:
+            raise HTTPError(reason=f"Malformed record! {w_t}") from error
 
     return array
 
@@ -167,6 +204,6 @@ handlers: Mapping[str, Type[WidgetHandler]] = {
 }
 
 if __name__ == "__main__":
-    app = Application(list(handlers.items()), debug=True)  # TODO: remove debug
+    app = Application(list(handlers.items()))
     app.listen(Settings.localhost_port)
     IOLoop.instance().start()

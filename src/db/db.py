@@ -1,7 +1,11 @@
-from dataclasses import (
-    dataclass,
-    replace,
-)
+"""
+db.py
+Patrick Applegate
+18 Oct 2022
+
+"""
+
+from dataclasses import dataclass
 from os.path import exists
 from sqlite3 import (
     ProgrammingError,
@@ -11,17 +15,18 @@ from typing import (
     List,
     Optional,
     Tuple,
-    Union,
     cast,
 )
 
-from ..defs.constants import Constants
 from ..defs.settings import Settings
 from .db_types import DbValues
 
 
 @dataclass(frozen=True)
 class Queries:
+    """
+    Provides the text for SQL commands.
+    """
 
     # NOTE: Trailing comma in SQL gives sqlite3.OperationalError
     create_table: str = """
@@ -68,10 +73,10 @@ def do_sql(
         if host_variables is None:
             try:
                 result = cursor.execute(query)
-            except ProgrammingError as e:
+            except ProgrammingError as error:
                 raise ValueError(
                     "host_variables cannot be None for this query!"
-                ) from e
+                ) from error
         else:
             result = (
                 cursor.execute(query, shifted(host_variables))
@@ -92,6 +97,10 @@ def do_sql(
 
 
 def shifted(host_variables: Tuple[str, ...]):
+    """
+    Moves the uuid from the first position to the last within host_variables
+    if we're doing an update.
+    """
 
     lst = list(host_variables)
     return tuple(lst[1:] + [lst[0]])
