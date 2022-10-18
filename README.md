@@ -12,18 +12,35 @@ You'll need `git`, Python 3.9, and `pipenv`.  After cloning down the repo, navig
 
 Here is a `pipenv shell` session illustrating the results of various static-analysis tools applied to the codebase.
 
-```shell
+### `black`
+```
 (crud_rest_api) 16:19 ~/crud_rest_api (main) black .
 All done! ✨ 🍰 ✨
 11 files left unchanged.
-(crud_rest_api) 16:19 ~/crud_rest_api (main) isort.
+```
+
+### `isort`
+```
+(crud_rest_api) 16:19 ~/crud_rest_api (main) isort .
 Skipped 5 files
+```
+
+### `mypy`
+```
 (crud_rest_api) 16:19 ~/crud_rest_api (main) mypy .
 Success: no issues found in 11 source files
+```
+
+### `pylint`
+```
 (crud_rest_api) 16:20 ~/crud_rest_api (main) pylint src/ tests/
 
 --------------------------------------------------------------------
 Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
+```
+
+### `pytest`
+```
 (crud_rest_api) 16:20 ~/crud_rest_api (main) pytest
 ======================================================== test session starts ========================================================
 platform linux -- Python 3.9.2, pytest-7.1.3, pluggy-1.0.0
@@ -33,6 +50,10 @@ collected 8 items
 tests/test_db.py ........                                                                                                     [100%]
 
 ========================================================= 8 passed in 0.25s =========================================================
+```
+
+### `bandit`
+```
 (crud_rest_api) 16:28 ~/crud_rest_api (main) bandit -r -c pyproject.toml .
 [main]  INFO    profile include tests: None
 [main]  INFO    profile exclude tests: None
