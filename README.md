@@ -6,7 +6,7 @@ This repo contains a basic create-read-update-delete (CRUD) API with standard en
 
 ## Getting started
 
-You'll need `git`, Python 3.9, and `pipenv`.  After cloning down the repo, navigate into the repo's top-level directory and use `pipenv install` to get all of the packages set up within a virtual environment.  Remember to use `pipenv run` or `pipenv shell` to work within the virtual environment; otherwise, you'll be using whatever Python packages you have installed otherwise.
+You'll need `git`, Python 3.9, and `pipenv`.  After cloning down the repo, navigate into the repo's top-level directory and use `pipenv install` to get all of the packages set up within a virtual environment.  Remember to use `pipenv run` or `pipenv shell` to work within the virtual environment; otherwise, you'll be using whatever Python packages you have installed outside of the environment.
 
 ## Checking the code
 

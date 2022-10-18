@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f56dd5b51332ccaf4534509dc185c67d95f55696669c53fc717b2e8134bc8a2a"
+            "sha256": "43e83ab5567422a6baf6f57d1e23c570b6c9452412a6977d26a54b9f35d87777"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,17 +16,6 @@
         ]
     },
     "default": {
-        "bandit": {
-            "extras": [
-                "toml"
-            ],
-            "hashes": [
-                "sha256:2d63a8c573417bae338962d4b9b06fbc6080f74ecd955a092849e1e65c717bd2",
-                "sha256:412d3f259dab4077d0e7f0c11f50f650cc7d10db905d98f6520a95a18049658a"
-            ],
-            "index": "pypi",
-            "version": "==1.7.4"
-        },
         "gitdb": {
             "hashes": [
                 "sha256:8033ad4e853066ba6ca92050b9df2f89301b8fc8bf7e9324d412a63f8bf1a8fd",
