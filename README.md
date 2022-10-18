@@ -2,7 +2,7 @@
 
 ## Summary
 
-This repo contains a basic create-read-update-delete (CRUD) API with standard endpoints (POST, GET, PATCH, and DELETE).  The Python code leverages the Tornado web framework and interfaces with a SQLite database.  It passes many tests with static-analysis tools (`black`, `isort`, `pylint`, `mypy`, `bandit`, and `pytest`).  Run the app with `pipenv run python -m src.main` from the top-level directory within the repo.  You can then issue commands like `requests.post('http://localhost:888/api/widgets', params={'name': 'widget1', 'parts': '5'})` and get reasonable responses.
+This repo contains a basic create-read-update-delete (CRUD) API with standard endpoints (POST, GET, PATCH, and DELETE).  The Python code leverages the Tornado web framework and interfaces with a SQLite database.  It passes many tests with static-analysis tools (`black`, `isort`, `pylint`, `mypy`, `bandit`, `pytest`, and `pipenv check`).  Run the app with `pipenv run python -m src.main` from the top-level directory within the repo.  You can then issue commands like `requests.post('http://localhost:888/api/widgets', params={'name': 'widget1', 'parts': '5'})` and get reasonable responses.
 
 ## Getting started
 
@@ -83,4 +83,14 @@ Run metrics:
                 High: 0
 Files skipped (0):
 ```
+
+### `pipenv check`
+```
+16:45 ~/crud_rest_api (main) pipenv check
+Checking PEP 508 requirements...
+Passed!
+Checking installed package safety...
+All good!
+```
+
 
