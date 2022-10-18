@@ -1,5 +1,9 @@
+from datetime import datetime, timezone
 from json import loads
 from typing import (
+    cast,
+    Dict,
+    List,
     Mapping,
     Optional,
     Type,
@@ -16,6 +20,7 @@ from .db.db import (
     Queries,
     do_sql,
 )
+from .db.db_types import DbValues
 from .defs.settings import Settings
 from .defs.widget import Widget
 
@@ -35,23 +40,31 @@ class WidgetHandler(RequestHandler):
 
         if params is None:
             db_widgets = do_sql(
-                Queries.select_all, None, Settings.database_path
+                Queries.select_all,
+                None,
+                Settings.database_path,
             )
         else:
             params_dict = parse(params)
             uuid = params_dict.get("uuid")
             name = params_dict.get("name")
+
             neither = uuid is None and name is None
             both = uuid is not None and name is not None
             if neither or both:
                 raise ValueError("params must include either uuid or name!")
-            elif uuid is not None:
+
+            if uuid is not None:
                 db_widgets = do_sql(
-                    Queries.select_by_uuid, (uuid,), Settings.database_path
+                    Queries.select_by_uuid,
+                    (uuid,),
+                    Settings.database_path,
                 )
             else:
                 db_widgets = do_sql(
-                    Queries.select_by_name, (name,), Settings.database_path
+                    Queries.select_by_name,
+                    (cast(str, name),),
+                    Settings.database_path,
                 )
 
         self.write({"widgets": to_array(db_widgets)})
@@ -64,60 +77,79 @@ class WidgetHandler(RequestHandler):
         """
         params_dict = parse(params)
         try:
-            new_widget = Widget(
+            new = Widget(
                 uuid=uuid4(),
                 name=params_dict.get("name"),
                 parts=int(params_dict.get("parts")),
                 created=datetime.now(timezone.utc),
                 updated=datetime.now(timezone.utc),
-            ).to_tuple()
+            )
         except ValueError as e:
             raise ValueError(
                 "Bad parameters supplied!"
-            ) from e  # TODO: change errors
+            ) from e  # TODO: fix errors -- emit to user, not server
         db_widgets = do_sql(
-            Queries.insert_record, new_widget, Settings.database_path
+            Queries.insert_record,
+            new.to_tuple(),
+            Settings.database_path,
         )
 
         self.write({"widgets": to_array(db_widgets)})
 
-    def put(self, params):
+    def patch(self, params):
         """
         Updates an existing record, given the values supplied in params.
         params should include a UUID that corresponds to a record in the
         database, and that record will be updated with information from the
-        other fields supplied through params.
+        other fields supplied through params.  Only the name and parts fields
+        can be directly changed by this route; the uuid and created fields are
+        fixed once set, and the updated field is changed automatically.
         """
         params_dict = dict(parse_qsl(params))
-        if len(params_dict) < 1:
-            raise ValueError("No parameters supplied!")
-        if "created" in params_dict.keys() or "updated" in params_dict.keys():
-            raise ValueError("Don't supply dates created and updated!")
+        to_update = {
+            k: v for k, v in params_dict.items() if k in ("name", "parts")
+        }
+        uuid = params["uuid"]  # TODO: can get an error here
+        db_widgets = do_sql(
+            Queries.select_by_uuid,
+            (uuid,),
+            Settings.database_path,
+        )  # TODO: another error if db_widgets is empty
+        old = Widget.from_tuple(db_widgets[0])
+        new = replace(
+            old_widget, **to_update, updated=datetime.now(timezone.utc)
+        )
 
-        # widget = Widget.from_dict(
+        db_widgets = do_sql(
+            Queries.update_by_uuid,
+            new.to_tuple(),
+            Settings.database_path,
+        )
+
+        self.write({"widgets": to_array(db_widgets)})
 
     def delete(self, params):
         """
         Deletes a record from the database with a UUID supplied in params.
         Other fields supplied through params will be ignored.  Sends back an
-        empty array of widgets if successful, indicating that the corresponding
-        record no longer exists in the database.
+        empty array if successful, indicating that the corresponding record
+        no longer exists in the database.
         """
         params_dict = parse(params)
         db_widgets = do_sql(
             Queries.delete_by_uuid,
-            (params_dict["uuid"],),
+            (params_dict["uuid"],),  # TODO: can get an error here
             Settings.database_path,
         )
 
         self.write({"widgets": to_array(db_widgets)})
 
 
-def parse(param_str: str) -> Dict[str, str]:
+def parse(api_params: str) -> Dict[str, str]:
     """
     Unpacks a string of params supplied to an API route to a dictionary.
     """
-    return dict(parse_qsl(params))
+    return dict(parse_qsl(api_params))
 
 
 def to_array(widget_tuples: List[DbValues]) -> List[Dict[str, str]]:
