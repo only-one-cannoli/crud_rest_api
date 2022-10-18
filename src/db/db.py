@@ -40,6 +40,7 @@ class Queries:
         insert into widgets values (?, ?, ?, ?, ?)
     """
     select_all: str = "select * from widgets"
+    select_by_name: str = "select * from widgets where name = ?"
     select_by_uuid: str = "select * from widgets where uuid = ?"
     update_by_uuid: str = """
         update widgets

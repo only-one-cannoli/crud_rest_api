@@ -53,6 +53,14 @@ class TestDatabase:
         )
         assert result == [widgets[k] for k in to_insert]
 
+    def test_select_by_name(self, widgets, to_insert):
+        result = do_sql(
+            Queries.select_by_name,
+            ("dummy",),
+            database=Settings.test_database_path,
+        )
+        assert result == [widgets[key] for key in to_insert]
+
     def test_select_by_uuid(self, widgets, to_insert):
         for key in to_insert:
             uuid = widgets[key][0]

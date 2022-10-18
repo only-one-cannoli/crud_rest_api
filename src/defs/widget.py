@@ -9,6 +9,7 @@ from uuid import UUID
 
 from tornado.web import RequestHandler
 
+from ..db.db_types import DbValues
 from .constants import Constants
 
 
@@ -22,8 +23,6 @@ class Widget:
     updated: datetime
 
     def __post_init__(self):
-        # this isn't going to help much except when we construct our API
-        # requests in Python
 
         if len(self.name) > 64:
             raise ValueError("Widget.name cannot exceed 64 characters!")
@@ -48,7 +47,7 @@ class Widget:
         )
 
     @staticmethod
-    def from_tuple(source: Tuple[str, str, int, str, str]):
+    def from_tuple(source: DbValues):
         return Widget(
             uuid=UUID(source[0]),
             name=source[1],
