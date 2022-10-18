@@ -33,18 +33,18 @@ class WidgetHandler(RequestHandler):
     def get(self):
         """
         Gets records from the database.  The specific behavior of this function
-        depends on the params passed through the request body (the data
-        argument in requests.get()).
-        If params is None, all records are retrieved.
-        If params contains a UUID, only the relevant record is retrieved.
-        If params contains a name, only the relevant records are retrieved.
-        Other (non-UUID, non-name) values in params are ignored.  Additional
-        UUIDs and names beyond the first supplied are also ignored.
+        depends on the information passed through the query parameters (the
+        params argument in requests.get()).  Values for fields other than
+        uuid and name are ignored, as are additional values of those fields.
+
+        Returns
+        * all records if neither uuid nor name are supplied
+        * 0-1 relevant records if a uuid is supplied (uuid is unique)
+        * 0-several relevant records if a name is supplied (name is not unique)
         """
         # TODO: add pagination
-        params = parse_arguments(self.request.body_arguments)
-        uuid = params.get("uuid")
-        name = params.get("name")
+        uuid = self.get_query_argument("uuid", None)
+        name = self.get_query_argument("name", None)
 
         if uuid is not None and name is not None:
             raise ValueError("Both uuid and name should not be supplied!")
@@ -75,23 +75,19 @@ class WidgetHandler(RequestHandler):
     def post(self):
         """
         Inserts a record into the database, given the values supplied in
-        params.  params should include values for the name and parts fields
-        of a Widget object; other fields will be ignored.
-        """
-        params = parse_arguments(self.request.body_arguments)
+        the query parameters (the params argument in requests.post()).  params
+        should include values for the name and parts fields of a Widget object;
+        other fields will be ignored.
 
-        try:
-            new = Widget(
-                uuid=uuid4(),
-                name=params.get("name"),
-                parts=int(params.get("parts")),
-                created=datetime.now(timezone.utc),
-                updated=datetime.now(timezone.utc),
-            )
-        except ValueError as e:
-            raise ValueError(
-                "Bad parameters supplied!"
-            ) from e  # TODO: fix errors -- emit to user, not server
+        Returns the inserted record.
+        """
+        new = Widget(
+            uuid=uuid4(),
+            name=self.get_query_argument("name"),
+            parts=int(self.get_query_argument("parts")),
+            created=datetime.now(timezone.utc),
+            updated=datetime.now(timezone.utc),
+        )
 
         db_widgets = do_sql(
             Queries.insert_record,
@@ -103,27 +99,28 @@ class WidgetHandler(RequestHandler):
 
     def patch(self):
         """
-        Updates an existing record, given the values supplied in params.
-        params should include a UUID that corresponds to a record in the
-        database, and that record will be updated with information from the
-        other fields supplied through params.  Only the name and parts fields
-        can be directly changed by this route; the uuid and created fields are
-        fixed once set, and the updated field is changed automatically.
-        """
-        params = parse_arguments(self.request.body_arguments)
-        to_update = {k: v for k, v in params.items() if k in ("name", "parts")}
-        uuid = params["uuid"]  # TODO: can get an error here
+        Updates an existing record, given the values supplied in the query
+        parameters (the params argument in requests.patch()).  data should
+        include a UUID that corresponds to a record in the database, and that
+        record will be updated with information from the other fields supplied.
+        Only the name and parts fields can be changed by this route; the uuid
+        and created fields are fixed once set, and the updated field is changed
+        automatically.
 
+        Returns the updated record.
+        """
         db_widgets = do_sql(
             Queries.select_by_uuid,
-            (uuid,),
+            (self.get_query_argument("uuid"),),
             Settings.database_path,
         )  # TODO: another error if db_widgets is empty
 
         old = Widget.from_tuple(db_widgets[0])
-        new = replace(
-            old_widget, **to_update, updated=datetime.now(timezone.utc)
-        )
+
+        params = {k: bytes.decode(v[0]) for k, v in arguments.items()}
+        to_update = {k: v for k, v in params.items() if k in ("name", "parts")}
+
+        new = replace(old, **to_update, updated=datetime.now(timezone.utc))
 
         db_widgets = do_sql(
             Queries.update_by_uuid,
@@ -136,26 +133,18 @@ class WidgetHandler(RequestHandler):
     def delete(self):
         """
         Deletes a record from the database with a UUID supplied in params.
-        Other fields supplied through params will be ignored.  Sends back an
-        empty array if successful, indicating that the corresponding record
-        no longer exists in the database.
-        """
-        params = parse_arguments(self.request.body_arguments)
+        Other fields supplied through params will be ignored.
 
+        Returns an empty array of records if successful, indicating that the
+        deleted record no longer exists in the database.
+        """
         db_widgets = do_sql(
             Queries.delete_by_uuid,
-            (params["uuid"],),  # TODO: can get an error here
+            (self.get_query_argument("uuid"),),
             Settings.database_path,
         )
 
         self.write({"widgets": to_array(db_widgets)})
-
-
-def parse_arguments(arguments: Dict[str, List[bytes]]) -> Dict[str, str]:
-    """
-    Unpacks a string of params supplied to an API route to a dictionary.
-    """
-    return {k: bytes.decode(v[0]) for k, v in arguments.items()}
 
 
 def to_array(widget_tuples: List[DbValues]) -> List[Dict[str, str]]:
