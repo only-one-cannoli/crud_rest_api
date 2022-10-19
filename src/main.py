@@ -115,7 +115,7 @@ class WidgetHandler(RequestHandler):
     def patch(self):
         """
         Updates an existing record, given the values supplied in the query
-        parameters (the params argument in requests.patch()).  data should
+        parameters (the params argument in requests.patch()).  params should
         include a UUID that corresponds to a record in the database, and that
         record will be updated with information from the other fields supplied.
         Only the name and parts fields can be changed by this route; the uuid

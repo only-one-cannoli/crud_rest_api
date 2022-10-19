@@ -3,6 +3,8 @@ db.py
 Patrick Applegate
 18 Oct 2022
 
+Provides query text and a key function for executing SQL queries against a
+SQLite database.
 """
 
 from dataclasses import dataclass
