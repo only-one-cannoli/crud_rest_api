@@ -6,7 +6,7 @@ This repo contains a basic create-read-update-delete (CRUD) API with standard en
 
 ## Getting started
 
-You'll need `git`, Python 3.9, and `pipenv`.  After cloning down the repo, navigate into the repo's top-level directory and use `pipenv install` to get all of the packages set up within a virtual environment.  Remember to use `pipenv run` or `pipenv shell` to work within the virtual environment; otherwise, you'll be using whatever Python packages you have installed outside of the environment.
+You'll need `git`, Python 3.9, and `pipenv`.  After cloning down the repo, navigate into the repo's top-level directory and use `pipenv install` and `pipenv install -d` to get all of the packages set up within a virtual environment.  Remember to use `pipenv run` or `pipenv shell` to work within the virtual environment; otherwise, you'll be using whatever Python packages you have installed outside of the environment.
 
 ## Interactive session
 
@@ -14,7 +14,7 @@ Remember to run `pipenv run python -m src.main` and to keep the session open whi
 
 ```
 19:48 ~/crud_rest_api (main) pipenv run ipython
-Python 3.9.2 (default, Feb 28 2021, 17:03:44) 
+Python 3.9.2 (default, Feb 28 2021, 17:03:44)
 Type 'copyright', 'credits' or 'license' for more information
 IPython 8.5.0 -- An enhanced Interactive Python. Type '?' for help.
 
