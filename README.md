@@ -132,7 +132,7 @@ Out[18]:
 
 ## Checking the code
 
-Here is a shell session illustrating the results of various static-analysis tools applied to the codebase.
+Here is a shell session illustrating the results of various static-analysis tools applied to the codebase.  Running `pipenv install -d` is needed to install most of these tools for use within the virtual environment.
 
 ### `black`
 ```
