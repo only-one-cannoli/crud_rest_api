@@ -82,9 +82,6 @@ def do_sql(
                     "host_variables cannot be None for this query!"
                 ) from error
         else:
-            if first_word == "update":
-                print(shifted(host_variables))
-                print(query)
             result = (
                 cursor.execute(query, shifted(host_variables))
                 if first_word == "update"
