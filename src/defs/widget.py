@@ -87,7 +87,7 @@ class Widget:
             "name": str(self.name),
             "parts": str(self.parts),
             "created": self.created.isoformat(),
-            "updated": self.created.isoformat(),
+            "updated": self.updated.isoformat(),
         }
 
     @staticmethod

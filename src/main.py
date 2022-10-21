@@ -96,12 +96,13 @@ class WidgetHandler(RequestHandler):
 
         Returns the inserted record.
         """
+        now = datetime.now(timezone.utc)
         new = Widget(
             uuid=uuid4(),
             name=self.get_query_argument("name"),
             parts=int(self.get_query_argument("parts")),
-            created=datetime.now(timezone.utc),
-            updated=datetime.now(timezone.utc),
+            created=now,
+            updated=now,
         )
 
         db_widgets = do_sql(
@@ -128,7 +129,7 @@ class WidgetHandler(RequestHandler):
 
         try:
             old = Widget.from_tuple(db_widgets[0])
-        except ValueError as error:
+        except (ValueError, TypeError) as error:
             raise HTTPError(
                 reason=f"Malformed record! {db_widgets[0]}"
             ) from error
@@ -193,7 +194,7 @@ def to_array(widget_tuples: List[DbValues]) -> List[Dict[str, str]]:
     for w_t in widget_tuples:
         try:
             array.append(Widget.from_tuple(w_t).to_dict())
-        except ValueError as error:
+        except (ValueError, TypeError) as error:
             raise HTTPError(reason=f"Malformed record! {w_t}") from error
 
     return array

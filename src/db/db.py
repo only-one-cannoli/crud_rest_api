@@ -41,17 +41,17 @@ class Queries:
         );
     """
     insert_record: str = """
-        insert into widgets values (?, ?, ?, ?, ?)
+        insert into widgets values (?, ?, ?, ?, ?);
     """
-    select_all: str = "select * from widgets"
-    select_by_name: str = "select * from widgets where name = ?"
-    select_by_uuid: str = "select * from widgets where uuid = ?"
+    select_all: str = "select * from widgets;"
+    select_by_name: str = "select * from widgets where name = ?;"
+    select_by_uuid: str = "select * from widgets where uuid = ?;"
     update_by_uuid: str = """
         update widgets
         set name = ?, parts = ?, created = ?, updated = ?
         where uuid = ?;
     """
-    delete_by_uuid: str = "delete from widgets where uuid = ?"
+    delete_by_uuid: str = "delete from widgets where uuid = ?;"
 
 
 def do_sql(
@@ -72,6 +72,8 @@ def do_sql(
     with connect(database) as connection:
         cursor = connection.cursor()
 
+        first_word = query.split()[0]
+
         if host_variables is None:
             try:
                 result = cursor.execute(query)
@@ -80,13 +82,15 @@ def do_sql(
                     "host_variables cannot be None for this query!"
                 ) from error
         else:
+            if first_word == "update":
+                print(shifted(host_variables))
+                print(query)
             result = (
                 cursor.execute(query, shifted(host_variables))
-                if "update" in query
+                if first_word == "update"
                 else cursor.execute(query, host_variables)
             )
 
-        first_word = query.split()[0]
         if first_word not in ("create", "select"):
             connection.commit()
             return do_sql(
