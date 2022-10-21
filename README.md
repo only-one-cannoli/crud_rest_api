@@ -26,108 +26,108 @@ In [2]: url = 'http://localhost:8888/api/widgets/'
 First, we run `requests.post()` in a loop to populate the database with some widgets.  We print the JSON content of the response each time; it contains the information that's being pushed to the database.
 
 ```
-In [3]: for i in range(3):
+In [6]: for i in range(3):
    ...:     print(requests.post(url, params={'name':f'widget{i}', 'parts':str(i)}).json())
-   ...: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb', 'name': 'widget0', 'parts': '0', 'created': '2022-10-18T23:49:36.466473+00:00', 'updated': '2022-10-18T23:49:36.466473+00:00'}]}
-{'widgets': [{'uuid': 'd91ebc64-9a06-4285-8ad4-31d310dfa41e', 'name': 'widget1', 'parts': '1', 'created': '2022-10-18T23:49:36.551389+00:00', 'updated': '2022-10-18T23:49:36.551389+00:00'}]}
-{'widgets': [{'uuid': '985186fe-6372-43d5-8f5e-611208292fb0', 'name': 'widget2', 'parts': '2', 'created': '2022-10-18T23:49:36.575893+00:00', 'updated': '2022-10-18T23:49:36.575893+00:00'}]}
+      ...: 
+      {'widgets': [{'uuid': '8d138027-a3c3-487a-8aea-6ad0cb3cfb9b', 'name': 'widget0', 'parts': '0', 'created': '2022-10-21T02:43:22.608875+00:00', 'updated': '2022-10-21T02:43:22.608875+00:00'}]}
+      {'widgets': [{'uuid': '5fa5390d-254a-4df8-8536-c2a68082be18', 'name': 'widget1', 'parts': '1', 'created': '2022-10-21T02:43:22.808379+00:00', 'updated': '2022-10-21T02:43:22.808379+00:00'}]}
+      {'widgets': [{'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada', 'name': 'widget2', 'parts': '2', 'created': '2022-10-21T02:43:22.840307+00:00', 'updated': '2022-10-21T02:43:22.840307+00:00'}]}
 ```
 
 `requests.get()` with no `params` argument shows the full contents of the database, showing that all three widgets are in the database.
 
 ```
-In [4]: requests.get(url).json()
-Out[4]: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb',
+In [7]: requests.get(url).json()
+Out[7]: 
+{'widgets': [{'uuid': '8d138027-a3c3-487a-8aea-6ad0cb3cfb9b',
    'name': 'widget0',
    'parts': '0',
-   'created': '2022-10-18T23:49:36.466473+00:00',
-   'updated': '2022-10-18T23:49:36.466473+00:00'},
-  {'uuid': 'd91ebc64-9a06-4285-8ad4-31d310dfa41e',
+   'created': '2022-10-21T02:43:22.608875+00:00',
+   'updated': '2022-10-21T02:43:22.608875+00:00'},
+  {'uuid': '5fa5390d-254a-4df8-8536-c2a68082be18',
    'name': 'widget1',
    'parts': '1',
-   'created': '2022-10-18T23:49:36.551389+00:00',
-   'updated': '2022-10-18T23:49:36.551389+00:00'},
-  {'uuid': '985186fe-6372-43d5-8f5e-611208292fb0',
+   'created': '2022-10-21T02:43:22.808379+00:00',
+   'updated': '2022-10-21T02:43:22.808379+00:00'},
+  {'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada',
    'name': 'widget2',
    'parts': '2',
-   'created': '2022-10-18T23:49:36.575893+00:00',
-   'updated': '2022-10-18T23:49:36.575893+00:00'}]}
+   'created': '2022-10-21T02:43:22.840307+00:00',
+   'updated': '2022-10-21T02:43:22.840307+00:00'}]}
 ```
 
 Specifying either `name` or `uuid` through the `params` argument in a `requests.get()` call yields the expected results.
 
 ```
-In [5]: requests.get(url, params={'name': 'widget1'}).json()
-Out[5]: 
-{'widgets': [{'uuid': 'd91ebc64-9a06-4285-8ad4-31d310dfa41e',
+In [8]: requests.get(url, params={'name': 'widget1'}).json()
+Out[8]: 
+{'widgets': [{'uuid': '5fa5390d-254a-4df8-8536-c2a68082be18',
    'name': 'widget1',
    'parts': '1',
-   'created': '2022-10-18T23:49:36.551389+00:00',
-   'updated': '2022-10-18T23:49:36.551389+00:00'}]}
+   'created': '2022-10-21T02:43:22.808379+00:00',
+   'updated': '2022-10-21T02:43:22.808379+00:00'}]}
 
-In [6]: requests.get(url, params={'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb'}).json()
-Out[6]: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb',
-   'name': 'widget0',
-   'parts': '0',
-   'created': '2022-10-18T23:49:36.466473+00:00',
-   'updated': '2022-10-18T23:49:36.466473+00:00'}]}
+In [9]: requests.get(url, params={'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada'}).json()
+Out[9]: 
+{'widgets': [{'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada',
+   'name': 'widget2',
+   'parts': '2',
+   'created': '2022-10-21T02:43:22.840307+00:00',
+   'updated': '2022-10-21T02:43:22.840307+00:00'}]}`
 ```
 
 Specifying a nonexistent `uuid` has a different behavior for `requests.get()` compared to (e.g.) `requests.patch()`; `requests.get()` produces an empty result, whereas `requests.patch()` actually produces a custom error.
 
 ```
-In [8]: requests.get(url, params={'uuid': 'not-a-real-uuid'}).json()
-Out[8]: {'widgets': []}
+In [10]: requests.get(url, params={'uuid': 'not-a-real-uuid'}).json()
+Out[10]: {'widgets': []}
 
-In [12]: requests.patch(url, params={'uuid': 'not-a-real-uuid'}).text
+In [12]: requests.patch(url, params={'uuid': 'not-a-real-uuid', 'name': 'this one'}).text
 Out[12]: '<html><title>500: No match for uuid in database!</title><body>500: No match for uuid in database!</body></html>'
 ```
 
-Patching with a `uuid` that exists within the database produces the expected result.
+Patching with a `uuid` that exists within the database produces the expected result.  Note that the `updated` field is changed with the name, even though it is not specified within the `requests.patch` call.
 
 ```
-In [14]: requests.patch(url, params={'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb', 'name': 'another widget'}).json()
+In [14]: requests.patch(url, params={'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada', 'name': 'another widget'}).json()
 Out[14]: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb',
+{'widgets': [{'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada',
    'name': 'another widget',
-   'parts': '0',
-   'created': '2022-10-18T23:49:36.466473+00:00',
-   'updated': '2022-10-18T23:49:36.466473+00:00'}]}
+   'parts': '2',
+   'created': '2022-10-21T02:43:22.840307+00:00',
+   'updated': '2022-10-21T02:49:53.135310+00:00'}]}
 
-In [15]: requests.get(url, params={'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb'}).json()
+In [15]: requests.get(url, params={'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada'}).json()
 Out[15]: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb',
+{'widgets': [{'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada',
    'name': 'another widget',
-   'parts': '0',
-   'created': '2022-10-18T23:49:36.466473+00:00',
-   'updated': '2022-10-21T02:16:09.687233+00:00'}]}
+   'parts': '2',
+   'created': '2022-10-21T02:43:22.840307+00:00',
+   'updated': '2022-10-21T02:49:53.135310+00:00'}]}
 ```
 
 Deleting also works well.
 
 ```
-In [16]: requests.delete(url, params={"uuid": 'd91ebc64-9a06-4285-8ad4-31d310dfa41e'})
+In [16]: requests.delete(url, params={'uuid': '5fa5390d-254a-4df8-8536-c2a68082be18'})
 Out[16]: <Response [200]>
 ```
 
 The final state of the database reflects both the patch and delete operations.
 
 ```
-In [18]: requests.get(url).json()
-Out[18]: 
-{'widgets': [{'uuid': '84f933c2-e43c-4eae-a14e-f322006c2beb',
-   'name': 'another widget',
+In [17]: requests.get(url).json()
+Out[17]: 
+{'widgets': [{'uuid': '8d138027-a3c3-487a-8aea-6ad0cb3cfb9b',
+   'name': 'widget0',
    'parts': '0',
-   'created': '2022-10-18T23:49:36.466473+00:00',
-   'updated': '2022-10-18T23:49:36.466473+00:00'},
-  {'uuid': '985186fe-6372-43d5-8f5e-611208292fb0',
-   'name': 'widget2',
+   'created': '2022-10-21T02:43:22.608875+00:00',
+   'updated': '2022-10-21T02:43:22.608875+00:00'},
+  {'uuid': 'ede2fd90-40d1-4776-9a66-1f9233a99ada',
+   'name': 'another widget',
    'parts': '2',
-   'created': '2022-10-18T23:49:36.575893+00:00',
-   'updated': '2022-10-18T23:49:36.575893+00:00'}]}
+   'created': '2022-10-21T02:43:22.840307+00:00',
+   'updated': '2022-10-21T02:49:53.135310+00:00'}]}
 ```
 
 ## TODO
